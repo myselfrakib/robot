@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Robot Controller</title>
+<title>Pro Robot Controller</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 
 <style>
 
@@ -23,65 +22,71 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+background:linear-gradient(135deg,#141E30,#243B55);
 color:white;
 }
 
-.container{
+.panel{
+width:380px;
+padding:30px;
+border-radius:26px;
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(20px);
+box-shadow:0 25px 70px rgba(0,0,0,.6);
 text-align:center;
-backdrop-filter:blur(18px);
-background:rgba(255,255,255,0.05);
-padding:40px;
-border-radius:24px;
-box-shadow:0 20px 60px rgba(0,0,0,.6);
-width:340px;
 }
 
 h1{
-margin-bottom:25px;
+margin-bottom:20px;
 font-weight:600;
-letter-spacing:1px;
 }
 
 .grid{
 display:grid;
 grid-template-columns:repeat(3,1fr);
-gap:18px;
+gap:16px;
+margin-top:10px;
 }
 
-button{
-height:75px;
+.btn{
+height:80px;
 border:none;
-border-radius:18px;
-font-size:22px;
-cursor:pointer;
-background:rgba(255,255,255,0.1);
+border-radius:20px;
+font-size:26px;
+background:rgba(255,255,255,.08);
 color:white;
-transition:.25s;
+transition:.2s;
 }
 
-button:hover{
-transform:scale(1.08);
-background:rgba(255,255,255,0.2);
+.btn:active{
+transform:scale(.92);
+background:rgba(255,255,255,.2);
 }
 
-button:active{
-transform:scale(.95);
+.stop{
+background:#ff4757;
+}
+
+.stop:active{
+background:#ff6b81;
 }
 
 .forward{grid-column:2;}
 .backward{grid-column:2;}
-.stop{
-background:#ff4757;
+
+.speedBox{
+margin-top:25px;
 }
-.stop:hover{
-background:#ff6b81;
+
+input[type=range]{
+width:100%;
+margin-top:10px;
 }
 
 .status{
-margin-top:20px;
+margin-top:18px;
 font-size:14px;
-opacity:.8;
+opacity:.85;
 }
 
 </style>
@@ -90,26 +95,53 @@ opacity:.8;
 
 <body>
 
-<div class="container">
+<div class="panel">
 
-<h1>🚀 Robot Control</h1>
+<h1>⚡ PRO ROBOT</h1>
 
 <div class="grid">
 
 <div></div>
-<button class="forward" onclick="sendCommand('F')">⬆</button>
+<button class="btn forward"
+onmousedown="move('F')"
+ontouchstart="move('F')"
+onmouseup="stop()"
+ontouchend="stop()">⬆</button>
 <div></div>
 
-<button onclick="sendCommand('L')">⬅</button> <button class="stop" onclick="sendCommand('S')">STOP</button> <button onclick="sendCommand('R')">➡</button>
+<button class="btn"
+onmousedown="move('L')"
+ontouchstart="move('L')"
+onmouseup="stop()"
+ontouchend="stop()">⬅</button>
+
+<button class="btn stop"
+onclick="stop()">STOP</button>
+
+<button class="btn"
+onmousedown="move('R')"
+ontouchstart="move('R')"
+onmouseup="stop()"
+ontouchend="stop()">➡</button>
 
 <div></div>
-<button class="backward" onclick="sendCommand('B')">⬇</button>
+<button class="btn backward"
+onmousedown="move('B')"
+ontouchstart="move('B')"
+onmouseup="stop()"
+ontouchend="stop()">⬇</button>
 <div></div>
 
 </div>
 
+<div class="speedBox">
+Speed
+<input type="range" min="80" max="255" value="150"
+onchange="setSpeed(this.value)">
+</div>
+
 <div class="status" id="status">
-Connecting to Firebase...
+READY
 </div>
 
 </div>
@@ -132,24 +164,32 @@ appId: "1:735847647314:web:ae023a0cd2c97f5659b78b"
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-window.sendCommand = function(command){
+window.move = function(direction){
 
-set(ref(db,"robot/command"),command)
-.then(()=>{
+set(ref(db,"robot/command"),direction);
 
 document.getElementById("status").innerText =
-"Command Sent: " + command;
-
-})
-.catch(()=>{
-document.getElementById("status").innerText =
-"Error sending command!";
-});
+"Moving " + direction;
 
 }
 
+window.stop = function(){
+
+set(ref(db,"robot/command"),"S");
+
 document.getElementById("status").innerText =
-"Connected ✅";
+"STOPPED";
+
+}
+
+window.setSpeed = function(value){
+
+set(ref(db,"robot/speed"),parseInt(value));
+
+document.getElementById("status").innerText =
+"Speed: " + value;
+
+}
 
 </script>
 
