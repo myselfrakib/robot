@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MQTT Robot Controller</title>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<style>
+
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+font-family:sans-serif;
+color:white;
+}
+
+.panel{
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(18px);
+padding:35px;
+border-radius:25px;
+text-align:center;
+width:360px;
+box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin-top:20px;
+}
+
+button{
+height:80px;
+border:none;
+border-radius:18px;
+font-size:26px;
+background:rgba(255,255,255,.08);
+color:white;
+}
+
+button:active{
+transform:scale(.92);
+background:rgba(255,255,255,.25);
+}
+
+.stop{
+background:#ff4757;
+}
+
+.forward{grid-column:2;}
+.backward{grid-column:2;}
+
+.status{
+margin-top:18px;
+font-size:14px;
+opacity:.8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="panel">
+
+<h2>⚡ MQTT ROBOT</h2>
+
+<div class="grid">
+
+<div></div>
+<button class="forward"
+onmousedown="send('F')"
+onmouseup="send('S')"
+ontouchstart="send('F')"
+ontouchend="send('S')">⬆</button>
+<div></div>
+
+<button
+onmousedown="send('L')"
+onmouseup="send('S')"
+ontouchstart="send('L')"
+ontouchend="send('S')">⬅</button>
+
+<button class="stop" onclick="send('S')">STOP</button>
+
+<button
+onmousedown="send('R')"
+onmouseup="send('S')"
+ontouchstart="send('R')"
+ontouchend="send('S')">➡</button>
+
+<div></div>
+<button class="backward"
+onmousedown="send('B')"
+onmouseup="send('S')"
+ontouchstart="send('B')"
+ontouchend="send('S')">⬇</button>
+<div></div>
+
+</div>
+
+<div class="status" id="status">
+Connecting...
+</div>
+
+</div>
+
+<script>
+
+const client = mqtt.connect(
+"wss://891a159af29949b8afbc60fdaed7eac3.s1.eu.hivemq.cloud:8884/mqtt",
+{
+username:"foro1",
+password:"#Hivemq321"
+});
+
+client.on("connect",()=>{
+document.getElementById("status").innerText="Connected ✅";
+});
+
+function send(cmd){
+
+client.publish("robot/01/command",cmd);
+
+document.getElementById("status").innerText=
+"Sent: "+cmd;
+}
+
+</script>
+
+</body>
+</html>
